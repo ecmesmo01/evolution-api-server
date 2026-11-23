@@ -1,0 +1,16 @@
+{
+  "name": "loucura-whatsapp-gateway",
+  "version": "1.0.0",
+  "description": "WhatsApp Baileys Gateway ultra-leve para Loucura de Ofertas",
+  "main": "server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "@whiskeysockets/baileys": "^6.7.9",
+    "express": "^4.19.2",
+    "pino": "^9.2.0",
+    "qrcode": "^1.5.3"
+  }
+}

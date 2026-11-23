@@ -52,6 +52,18 @@ async function connectToWhatsApp() {
       console.log('🎉 [WhatsApp] Conectado e pronto para disparos com sucesso!');
     }
   });
+
+  // Escuta mensagens recebidas para capturar o ID do grupo automaticamente
+  sock.ev.on('messages.upsert', async ({ messages }) => {
+    for (const msg of messages) {
+      const from = msg.key?.remoteJid || '';
+      const text = msg.message?.conversation || msg.message?.extendedTextMessage?.text || '';
+      console.log(`📩 [Msg Recebida] De: ${from} | Texto: ${text}`);
+      if (from.endsWith('@g.us')) {
+        console.log(`🎯 [GRUPO DETECTADO!] ID: ${from}`);
+      }
+    }
+  });
 }
 
 // 1. Página visual para escanear QR Code no navegador

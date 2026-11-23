@@ -98,7 +98,42 @@ app.get('/', (req, res) => {
   });
 });
 
-// 3. Endpoint de Envio de Oferta (com ou sem foto)
+// 3. Listar grupos em que o WhatsApp está presente
+app.get('/groups', async (req, res) => {
+  if (connectionStatus !== 'open' || !sock) {
+    return res.status(503).json({ error: 'WhatsApp desconectado.' });
+  }
+
+  try {
+    const chats = await sock.groupFetchAllParticipating();
+    const result = Object.values(chats).map(g => ({
+      id: g.id,
+      name: g.subject,
+      participants: g.participants ? g.participants.length : 0
+    }));
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// 4. Entrar no grupo via código de convite (ex: Goc7INyE58e695xwlPTr4l)
+app.post('/join-group', async (req, res) => {
+  if (connectionStatus !== 'open' || !sock) {
+    return res.status(503).json({ error: 'WhatsApp desconectado.' });
+  }
+
+  const { inviteCode } = req.body;
+  try {
+    const cleanCode = inviteCode.replace('https://chat.whatsapp.com/', '').split('?')[0].trim();
+    const groupId = await sock.groupAcceptInvite(cleanCode);
+    res.json({ success: true, groupId });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// 5. Endpoint de Envio de Oferta (com ou sem foto)
 app.post('/send-deal', async (req, res) => {
   const authHeader = req.headers['apikey'] || req.headers['authorization'];
   if (authHeader !== API_KEY) {
